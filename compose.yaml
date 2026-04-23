@@ -1,0 +1,16 @@
+services:
+  discovery-service:
+    build:
+      context: ./EurekaNamingService
+    container_name: discovery-service
+    ports:
+      - "8761:8761"
+
+  api-gateway:
+    build:
+      context: ./CloudGateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - discovery-service
