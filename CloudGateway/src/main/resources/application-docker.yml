@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+        - id: event-service
+          uri: lb://event-service
+          predicates:
+            - Path=/api/events/**,/api/organizer/events/**
+        - id: review-service
+          uri: lb://review-service
+          predicates:
+            - Path=/api/reviews/**
+        - id: ticketing-service
+          uri: lb://ticketing-service
+          predicates:
+            - Path=/api/tickets/**
+        - id: content-service
+          uri: lb://content-service
+          predicates:
+            - Path=/api/content/**
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-service:8761/eureka
