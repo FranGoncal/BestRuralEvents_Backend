@@ -1,4 +1,10 @@
 package com.bestRuralEvents.AuthService.DTO;
 
-public class LoginResponse {
-}
+public record LoginResponse(
+        String message,
+        Long userId,
+        String email,
+        String role,
+        String accessToken,
+        String tokenType
+) {}

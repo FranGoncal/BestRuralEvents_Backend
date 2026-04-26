@@ -1,4 +1,3 @@
 package com.bestRuralEvents.AuthService.DTO;
 
-public class MessageResponse {
-}
+public record MessageResponse(String message) {}

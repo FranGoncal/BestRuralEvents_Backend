@@ -1,4 +1,7 @@
 package com.bestRuralEvents.AuthService.DTO;
 
-public class SignupResponse {
-}
+public record SignupResponse(
+        String message,
+        Long userId,
+        String email
+) {}

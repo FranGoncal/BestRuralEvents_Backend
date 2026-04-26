@@ -1,0 +1,37 @@
+insert into auth_users (
+    id,
+    email,
+    password_hash,
+    role,
+    enabled,
+    created_at,
+    updated_at
+)
+values
+    (
+        1,
+        'a@a.a',
+        '$2a$10$R4Ve2vlG8VAtYulWiEREjOi2crPXWVxUo0WZxeHyZo50hu19nH6/i',
+        'USER',
+        true,
+        current_timestamp,
+        current_timestamp
+    ),
+    (
+        2,
+        'maria3@example.com',
+        '$2a$10$R4Ve2vlG8VAtYulWiEREjOi2crPXWVxUo0WZxeHyZo50hu19nH6/i',
+        'USER',
+        false,
+        current_timestamp,
+        current_timestamp
+    ),
+    (
+        3,
+        'joao@example.com',
+        '$2a$10$R4Ve2vlG8VAtYulWiEREjOi2crPXWVxUo0WZxeHyZo50hu19nH6/i',
+        'USER',
+        false,
+        current_timestamp,
+        current_timestamp
+    );
