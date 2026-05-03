@@ -4,6 +4,7 @@ import com.bestRuralEvents.EventService.DTO.*;
 import com.bestRuralEvents.EventService.mappers.EventMapper;
 import com.bestRuralEvents.EventService.models.Event;
 import com.bestRuralEvents.EventService.models.EventStatus;
+import com.bestRuralEvents.EventService.models.TicketMode;
 import com.bestRuralEvents.EventService.repositories.EventRepository;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.*;
@@ -39,6 +40,7 @@ public class EventService {
 
     public EventResponse updateEvent(Long eventId, EventRequest request, Long organizerId) {
         validateDates(request.startDate(), request.endDate());
+        validateCapacity(request);
 
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
@@ -194,6 +196,16 @@ public class EventService {
         };
     }
 
+    public void updateEventRating(Long eventId, UpdateEventRatingRequest request) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+
+        event.setAverageRating(request.averageRating());
+        event.setTotalReviews(request.totalReviews());
+
+        eventRepository.save(event);
+    }
+
     private LocalDateTime getLastUpdated() {
         return eventRepository.findTopByOrderByUpdatedAtDesc()
                 .map(Event::getUpdatedAt)
@@ -207,6 +219,37 @@ public class EventService {
 
         if (endDate.isBefore(startDate)) {
             throw new RuntimeException("End date cannot be before start date");
+        }
+    }
+
+    private void validateCapacity(EventRequest request) {
+        if (request.capacity() == null || request.capacity() < 1) {
+            throw new RuntimeException("Capacity must be at least 1");
+        }
+
+        if (request.ticketMode() == TicketMode.EVENT_PASS) {
+            return;
+        }
+
+        if (request.ticketMode() == TicketMode.PER_DAY) {
+            if (request.dailyCapacities() == null || request.dailyCapacities().isEmpty()) {
+                throw new RuntimeException("Daily capacities are required for PER_DAY events");
+            }
+
+            for (EventDayCapacityRequest dayCapacity : request.dailyCapacities()) {
+                if (dayCapacity.date() == null) {
+                    throw new RuntimeException("Daily capacity date is required");
+                }
+
+                if (dayCapacity.capacity() == null || dayCapacity.capacity() < 1) {
+                    throw new RuntimeException("Daily capacity must be at least 1");
+                }
+
+                if (dayCapacity.date().isBefore(request.startDate()) ||
+                        dayCapacity.date().isAfter(request.endDate())) {
+                    throw new RuntimeException("Daily capacity date must be inside event date range");
+                }
+            }
         }
     }
 }

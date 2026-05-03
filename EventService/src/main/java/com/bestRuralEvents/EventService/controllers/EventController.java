@@ -98,4 +98,12 @@ public class EventController {
                 event
         );
     }
+
+    @PutMapping("/{eventId}/rating")
+    public void updateEventRating(
+            @PathVariable Long eventId,
+            @RequestBody UpdateEventRatingRequest request
+    ) {
+        eventService.updateEventRating(eventId, request);
+    }
 }

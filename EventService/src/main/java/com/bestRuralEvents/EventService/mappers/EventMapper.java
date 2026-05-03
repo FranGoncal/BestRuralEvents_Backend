@@ -22,6 +22,13 @@ public class EventMapper {
         event.setCurrency(Currency.getInstance("EUR"));
         event.setStatus(EventStatus.APPROVED);
 
+        event.setRefundable(
+                request.refundable() != null ? request.refundable() : false
+        );
+
+        event.setRefundDeadlineDays(request.refundDeadlineDays());
+        event.setRefundPolicy(request.refundPolicy());
+
         event.setCategory(
                 request.category() != null
                         ? request.category()
@@ -41,6 +48,17 @@ public class EventMapper {
 
         if (request.images() != null) {
             event.setImages(request.images());
+        }
+
+        event.setCapacity(request.capacity());
+
+        if (request.dailyCapacities() != null) {
+            event.setDailyCapacities(
+                    request.dailyCapacities()
+                            .stream()
+                            .map(dc -> new EventDayCapacity(dc.date(), dc.capacity()))
+                            .toList()
+            );
         }
 
         return event;
@@ -52,6 +70,14 @@ public class EventMapper {
         event.setLocation(request.location());
         event.setPrice(request.price());
 
+
+        event.setRefundable(
+                request.refundable() != null ? request.refundable() : false
+        );
+
+        event.setRefundDeadlineDays(request.refundDeadlineDays());
+        event.setRefundPolicy(request.refundPolicy());
+
         event.setCategory(
                 request.category() != null
                         ? request.category()
@@ -72,6 +98,18 @@ public class EventMapper {
         if (request.images() != null) {
             event.setImages(request.images());
         }
+        event.setCapacity(request.capacity());
+
+        event.getDailyCapacities().clear();
+
+        if (request.dailyCapacities() != null) {
+            event.getDailyCapacities().addAll(
+                    request.dailyCapacities()
+                            .stream()
+                            .map(dc -> new EventDayCapacity(dc.date(), dc.capacity()))
+                            .toList()
+            );
+        }
     }
 
     public static EventResponse toResponse(Event event) {
@@ -80,20 +118,19 @@ public class EventMapper {
                 event.getTitle(),
                 event.getDescription(),
                 event.getOrganizerId(),
+                event.getCapacity(),
                 event.getStatus(),
                 event.getCategory(),
                 event.getPrice(),
-                event.getCurrency() != null ? event.getCurrency().getCurrencyCode() : "EUR",
+                event.getCurrency(),
                 event.getLocation(),
-                event.getDates() != null ? event.getDates().getStartDate() : null,
-                event.getDates() != null ? event.getDates().getEndDate() : null,
+                event.getDates().getStartDate(),
+                event.getDates().getEndDate(),
                 event.getImages(),
                 event.getTicketMode(),
-                event.getAverageRating(),
-                event.getTotalReviews(),
-                event.getCreatedAt(),
-                event.getUpdatedAt(),
-                event.getPublishedAt()
+                event.getRefundable(),
+                event.getRefundDeadlineDays(),
+                event.getRefundPolicy()
         );
     }
 }

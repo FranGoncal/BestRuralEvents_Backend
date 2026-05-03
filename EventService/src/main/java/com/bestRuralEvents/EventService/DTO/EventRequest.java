@@ -3,6 +3,7 @@ package com.bestRuralEvents.EventService.DTO;
 import com.bestRuralEvents.EventService.models.EventCategory;
 import com.bestRuralEvents.EventService.models.TicketMode;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -33,6 +34,17 @@ public record EventRequest(
 
         TicketMode ticketMode,
 
-        List<String> images
-) {
-}
+        List<String> images,
+
+        @NotNull(message = "Capacity is required")
+        @Min(value = 1, message = "Capacity must be at least 1")
+        Integer capacity,
+
+        List<EventDayCapacityRequest> dailyCapacities,
+
+        Boolean refundable,
+
+        Integer refundDeadlineDays,
+
+        String refundPolicy
+) {}

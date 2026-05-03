@@ -24,6 +24,14 @@ public class Event {
     private Long id;
 
     @Column(nullable = false)
+    private Boolean refundable = false;
+
+    private Integer refundDeadlineDays;
+
+    @Column(length = 1000)
+    private String refundPolicy;
+
+    @Column(nullable = false)
     private String title;
 
     @Column(length = 3000)
@@ -31,6 +39,16 @@ public class Event {
 
     @Column(nullable = false)
     private Long organizerId;
+
+    @Column(nullable = false)
+    private Integer capacity;
+
+    @ElementCollection
+    @CollectionTable(
+            name = "event_daily_capacities",
+            joinColumns = @JoinColumn(name = "event_id")
+    )
+    private List<EventDayCapacity> dailyCapacities = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -52,6 +70,11 @@ public class Event {
     @Embedded
     private EventDate dates;
 
+    @ElementCollection
+    @CollectionTable(
+            name = "event_images",
+            joinColumns = @JoinColumn(name = "event_id")
+    )
     @Column(name = "image_url")
     private List<String> images = new ArrayList<>();
 

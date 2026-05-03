@@ -7,6 +7,7 @@ import com.bestRuralEvents.EventService.models.TicketMode;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Currency;
 import java.util.List;
 
 public record EventResponse(
@@ -14,19 +15,17 @@ public record EventResponse(
         String title,
         String description,
         Long organizerId,
+        Integer capacity,
         EventStatus status,
         EventCategory category,
         BigDecimal price,
-        String currency,
+        Currency currency,
         String location,
         LocalDate startDate,
         LocalDate endDate,
         List<String> images,
         TicketMode ticketMode,
-        Double averageRating,
-        Integer totalReviews,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt,
-        LocalDateTime publishedAt
-) {
-}
+        Boolean refundable,
+        Integer refundDeadlineDays,
+        String refundPolicy
+) {}
