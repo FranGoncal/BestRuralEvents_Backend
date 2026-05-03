@@ -1,4 +1,7 @@
 package com.bestRuralEvents.ReviewService.dto;
 
-public class UserResponse {
-}
+public record UserResponse(
+        Long id,
+        String name,
+        String email
+) {}

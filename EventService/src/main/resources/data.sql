@@ -29,14 +29,14 @@ VALUES (
            5.00,
            'EUR',
            'Bragança',
-           '2026-08-10',
-           '2026-08-12',
+           '2026-05-15',
+           '2026-05-16',
            'PER_DAY',
            240,
            4.8,
            7,
            true,
-           7,
+           5,
            'Refunds are available up to 7 days before the event starts.',
            CURRENT_TIMESTAMP,
            CURRENT_TIMESTAMP,
@@ -45,8 +45,8 @@ VALUES (
 
 INSERT INTO event_images (event_id, image_url)
 VALUES
-    (1, 'https://example.com/image1.jpg'),
-    (1, 'https://example.com/image2.jpg');
+    (1, 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee'),
+    (1, 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee');
 
 INSERT INTO event_daily_capacities (event_id, date, capacity)
 VALUES

@@ -2,6 +2,7 @@ package com.bestRuralEvents.UserService.Controller;
 
 import com.bestRuralEvents.UserService.DTO.CreateUserProfileRequest;
 import com.bestRuralEvents.UserService.DTO.MessageResponse;
+import com.bestRuralEvents.UserService.DTO.UserResponse;
 import com.bestRuralEvents.UserService.Service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -22,5 +23,10 @@ public class InternalUserController {
     ) {
         userService.createUserProfile(request);
         return new MessageResponse("User profile created successfully");
+    }
+
+    @GetMapping("/{userId}")
+    public UserResponse getUserById(@PathVariable Long userId) {
+        return userService.getUserById(userId);
     }
 }

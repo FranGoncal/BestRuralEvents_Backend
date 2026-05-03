@@ -130,7 +130,9 @@ public class EventMapper {
                 event.getTicketMode(),
                 event.getRefundable(),
                 event.getRefundDeadlineDays(),
-                event.getRefundPolicy()
+                event.getRefundPolicy(),
+                event.getAverageRating() == null ? 0.0 : event.getAverageRating(),
+                event.getTotalReviews() == null ? 0 : event.getTotalReviews()
         );
     }
 }

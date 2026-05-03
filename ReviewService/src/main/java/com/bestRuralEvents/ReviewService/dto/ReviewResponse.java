@@ -7,6 +7,9 @@ public record ReviewResponse(
         Long id,
         Long eventId,
         Long userId,
+        String userName,
+        String eventName,
+        LocalDateTime eventDate,
         Integer rating,
         String comment,
         LocalDateTime createdAt

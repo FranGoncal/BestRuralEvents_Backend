@@ -1,12 +1,11 @@
 package com.bestRuralEvents.ReviewService.services;
 
-import com.bestRuralEvents.ReviewService.clients.EventClient;
-import com.bestRuralEvents.ReviewService.dto.CreateReviewRequest;
-import com.bestRuralEvents.ReviewService.dto.RatingSummaryResponse;
-import com.bestRuralEvents.ReviewService.dto.ReviewResponse;
-import com.bestRuralEvents.ReviewService.dto.UpdateEventRatingRequest;
+import com.bestRuralEvents.ReviewService.dto.*;
+import com.bestRuralEvents.ReviewService.proxy.EventProxy;
 import com.bestRuralEvents.ReviewService.models.Review;
+import com.bestRuralEvents.ReviewService.proxy.UserProxy;
 import com.bestRuralEvents.ReviewService.repositories.ReviewRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,27 +14,33 @@ import java.util.List;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
-    private final EventClient eventClient;
+    private final EventProxy eventClient;
+    private final UserProxy userClient;
 
     public ReviewService(
             ReviewRepository reviewRepository,
-            EventClient eventClient
+            EventProxy eventClient,
+            UserProxy userClient
     ) {
         this.reviewRepository = reviewRepository;
         this.eventClient = eventClient;
+        this.userClient = userClient;
     }
 
+    @Transactional
     public ReviewResponse createReview(CreateReviewRequest request, Long userId) {
 
         eventClient.getEventById(request.eventId());
 
-        if (reviewRepository.existsByEventIdAndUserId(request.eventId(), userId)) {
-            throw new IllegalStateException("You have already reviewed this event");
-        }
+        Review review = reviewRepository
+                .findByEventIdAndUserId(request.eventId(), userId)
+                .orElseGet(() -> {
+                    Review newReview = new Review();
+                    newReview.setEventId(request.eventId());
+                    newReview.setUserId(userId);
+                    return newReview;
+                });
 
-        Review review = new Review();
-        review.setEventId(request.eventId());
-        review.setUserId(userId);
         review.setRating(request.rating());
         review.setComment(cleanComment(request.comment()));
 
@@ -73,6 +78,7 @@ public class ReviewService {
         );
     }
 
+    @Transactional
     public void deleteReview(Long reviewId, Long userId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("Review not found"));
@@ -88,6 +94,7 @@ public class ReviewService {
         updateEventRatingAggregate(eventId);
     }
 
+    @Transactional
     public ReviewResponse updateReview(
             Long reviewId,
             CreateReviewRequest request,
@@ -131,13 +138,21 @@ public class ReviewService {
     }
 
     private ReviewResponse toResponse(Review review) {
+        EventResponse event = eventClient.getEventById(review.getEventId());
+        UserResponse user = userClient.getUserById(review.getUserId());
+
         return new ReviewResponse(
                 review.getId(),
                 review.getEventId(),
                 review.getUserId(),
+                user.name(),
+                event.title(),
+                event.date(),
                 review.getRating(),
                 review.getComment(),
                 review.getCreatedAt()
         );
     }
+
+
 }

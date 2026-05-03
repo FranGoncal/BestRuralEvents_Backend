@@ -7,6 +7,7 @@ import com.bestRuralEvents.EventService.models.EventStatus;
 import com.bestRuralEvents.EventService.models.TicketMode;
 import com.bestRuralEvents.EventService.repositories.EventRepository;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -196,7 +197,13 @@ public class EventService {
         };
     }
 
+    @Transactional
     public void updateEventRating(Long eventId, UpdateEventRatingRequest request) {
+
+        System.out.println("Received rating update for event " + eventId);
+        System.out.println("New average: " + request.averageRating());
+        System.out.println("New total reviews: " + request.totalReviews());
+
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
@@ -204,6 +211,8 @@ public class EventService {
         event.setTotalReviews(request.totalReviews());
 
         eventRepository.save(event);
+
+        System.out.println("Saved successfully.");
     }
 
     private LocalDateTime getLastUpdated() {
@@ -252,4 +261,6 @@ public class EventService {
             }
         }
     }
+
+
 }

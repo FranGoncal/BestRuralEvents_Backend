@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
@@ -27,4 +28,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         where r.eventId = :eventId
     """)
     Long getTotalReviews(Long eventId);
+
+    Optional<Review> findByEventIdAndUserId(Long eventId, Long userId);
 }

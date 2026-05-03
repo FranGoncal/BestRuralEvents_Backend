@@ -3,6 +3,7 @@ package com.bestRuralEvents.UserService.Service;
 import com.bestRuralEvents.UserService.DTO.CreateUserProfileRequest;
 import com.bestRuralEvents.UserService.DTO.UpdateUserProfileRequest;
 import com.bestRuralEvents.UserService.DTO.UserProfileResponse;
+import com.bestRuralEvents.UserService.DTO.UserResponse;
 import com.bestRuralEvents.UserService.Repository.UserRepository;
 import com.bestRuralEvents.UserService.models.User;
 import org.springframework.stereotype.Service;
@@ -54,5 +55,16 @@ public class UserService {
         user.setBirthDate(request.birthDate());
 
         userRepository.save(user);
+    }
+
+    public UserResponse getUserById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return new UserResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail()
+        );
     }
 }

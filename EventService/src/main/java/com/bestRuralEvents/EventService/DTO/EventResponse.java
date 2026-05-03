@@ -27,5 +27,7 @@ public record EventResponse(
         TicketMode ticketMode,
         Boolean refundable,
         Integer refundDeadlineDays,
-        String refundPolicy
+        String refundPolicy,
+        Double averageRating,
+        Integer totalReviews
 ) {}

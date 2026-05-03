@@ -1,4 +1,9 @@
 package com.bestRuralEvents.ReviewService.dto;
 
-public class EventResponse {
-}
+import java.time.LocalDateTime;
+
+public record EventResponse(
+        Long id,
+        String title,
+        LocalDateTime date
+) {}
