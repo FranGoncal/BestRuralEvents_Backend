@@ -60,7 +60,7 @@ public class TicketService {
         ticket.setStatus(TicketStatus.ACTIVE);
         ticket.setValidationToken(UUID.randomUUID().toString());
         ticket.setPricePaid(event.price());
-        ticket.setCurrency(Currency.getInstance(event.currency()));
+        ticket.setCurrency(event.currency());
 
         Ticket saved = ticketRepository.save(ticket);
 
@@ -96,23 +96,46 @@ public class TicketService {
     }
 
     private TicketResponse toResponse(Ticket ticket) {
+        EventResponse event = proxyEvent.getEventById(ticket.getEventId());
+
+        String imageUrl = "";
+
+        if (event.images() != null && !event.images().isEmpty()) {
+            imageUrl = event.images().get(0);
+        }
+
+        TicketEventResponse ticketEvent = new TicketEventResponse(
+                event.id(),
+                event.title(),
+                event.location(),
+                event.startDate(),
+                imageUrl,
+                event.price(),
+                event.averageRating(),
+                event.totalReviews(),
+                event.description()
+        );
+
         return new TicketResponse(
                 ticket.getId(),
-                ticket.getUserId(),
-                ticket.getEventId(),
-                ticket.getTicketMode(),
-                ticket.getSelectedDays(),
-                ticket.getStatus(),
-                ticket.getValidationToken(),
+                ticketEvent,
                 ticket.getPricePaid(),
-                ticket.getCurrency(),
-                ticket.getCreatedAt()
+                event.refundPolicy(),
+                ticket.getCreatedAt(),
+                canCancel(ticket, event),
+                ticket.getStatus() == TicketStatus.ACTIVE || ticket.getStatus() == TicketStatus.USED,
+                1,
+                "",
+                "",
+                ticket.getCreatedAt(),
+                ticket.getStatus()
         );
     }
 
     public List<TicketResponse> getUserTickets(Long userId) {
         return ticketRepository.findByUserIdOrderByCreatedAtDesc(userId)
                 .stream()
+                .filter(ticket -> ticket.getStatus() != TicketStatus.CANCELLED)
                 .map(this::toResponse)
                 .toList();
     }
@@ -134,21 +157,29 @@ public class TicketService {
                 .toList();
     }
 
-    public TicketResponse validateTicket(Long organizerId, ValidateTicketRequest request) {
-        Ticket ticket = ticketRepository.findByValidationToken(request.validationToken())
-                .orElseThrow(() -> new RuntimeException("Invalid ticket token"));
+    public TicketValidationResponse validateTicket(Long ticketId) {
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElse(null);
 
-        EventResponse event = proxyEvent.getEventById(ticket.getEventId());
-
-        if (ticket.getStatus() != TicketStatus.ACTIVE) {
-            throw new RuntimeException("Ticket is not active");
+        if (ticket == null) {
+            return new TicketValidationResponse(
+                    false,
+                    ticketId,
+                    null,
+                    null,
+                    null
+            );
         }
 
-        ticket.setStatus(TicketStatus.USED);
+        boolean valid = ticket.getStatus() == TicketStatus.ACTIVE;
 
-        Ticket saved = ticketRepository.save(ticket);
-
-        return toResponse(saved);
+        return new TicketValidationResponse(
+                valid,
+                ticket.getId(),
+                ticket.getUserId(),
+                ticket.getEventId(),
+                ticket.getValidationToken()
+        );
     }
 
     public TicketResponse cancelTicket(Long userId, Long ticketId) {
@@ -159,36 +190,10 @@ public class TicketService {
             throw new RuntimeException("You are not allowed to cancel this ticket");
         }
 
-        if (ticket.getStatus() != TicketStatus.ACTIVE) {
-            throw new RuntimeException("Only active tickets can be cancelled");
-        }
-
         EventResponse event = proxyEvent.getEventById(ticket.getEventId());
 
-        if (!Boolean.TRUE.equals(event.refundable())) {
-            System.out.println(event.refundable());
-            throw new RuntimeException("This event is not refundable");
-        }
-
-        LocalDate refundBaseDate;
-
-        if (ticket.getTicketMode() == TicketMode.EVENT_PASS) {
-            refundBaseDate = event.startDate();
-        } else {
-            refundBaseDate = ticket.getSelectedDays()
-                    .stream()
-                    .min(LocalDate::compareTo)
-                    .orElse(event.startDate());
-        }
-
-        int deadlineDays = event.refundDeadlineDays() == null
-                ? 0
-                : event.refundDeadlineDays();
-
-        LocalDate refundDeadline = refundBaseDate.minusDays(deadlineDays);
-
-        if (LocalDate.now().isAfter(refundDeadline)) {
-            throw new RuntimeException("Refund deadline has passed");
+        if (!canCancel(ticket, event)) {
+            throw new RuntimeException("This ticket can no longer be cancelled");
         }
 
         ticket.setStatus(TicketStatus.CANCELLED);
@@ -198,4 +203,23 @@ public class TicketService {
         return toResponse(saved);
     }
 
+
+
+    private boolean canCancel(Ticket ticket, EventResponse event) {
+        if (ticket.getStatus() != TicketStatus.ACTIVE) {
+            return false;
+        }
+
+        if (!Boolean.TRUE.equals(event.refundable())) {
+            return false;
+        }
+
+        if (event.startDate() == null || event.refundDeadlineDays() == null) {
+            return false;
+        }
+
+        LocalDate limitDate = event.startDate().minusDays(event.refundDeadlineDays());
+
+        return LocalDate.now().isBefore(limitDate);
+    }
 }

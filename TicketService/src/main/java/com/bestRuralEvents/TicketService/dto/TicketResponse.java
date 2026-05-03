@@ -10,15 +10,18 @@ import java.time.LocalDateTime;
 import java.util.Currency;
 import java.util.List;
 
+
 public record TicketResponse(
         Long id,
-        Long userId,
-        Long eventId,
-        TicketMode ticketMode,
-        List<LocalDate> selectedDays,
-        TicketStatus status,
-        String validationToken,
-        BigDecimal pricePaid,
-        Currency currency,
-        LocalDateTime createdAt
+        TicketEventResponse event,
+        BigDecimal price,
+        String refundRules,
+        LocalDateTime purchaseDate,
+        Boolean canCancel,
+        Boolean canReview,
+        Integer quantity,
+        String customerName,
+        String customerEmail,
+        LocalDateTime createdAt,
+        TicketStatus status
 ) {}

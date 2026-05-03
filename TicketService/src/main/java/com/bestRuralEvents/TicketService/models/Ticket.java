@@ -55,6 +55,8 @@ public class Ticket {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+
+
     @PrePersist
     public void onCreate() {
         this.createdAt = LocalDateTime.now();

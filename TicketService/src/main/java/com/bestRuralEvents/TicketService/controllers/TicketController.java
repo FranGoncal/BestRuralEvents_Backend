@@ -40,14 +40,6 @@ public class TicketController {
         return ticketService.cancelTicket(userId, ticketId);
     }
 
-    @PostMapping("/validate")
-    public TicketResponse validateTicket(
-            @RequestHeader("X-User-Id") Long organizerId,
-            @Valid @RequestBody ValidateTicketRequest request
-    ) {
-        return ticketService.validateTicket(organizerId, request);
-    }
-
     @GetMapping("/event/{eventId}")
     public List<TicketResponse> getEventTickets(
             @RequestHeader("X-User-Id") Long organizerId,
@@ -62,5 +54,12 @@ public class TicketController {
             @RequestParam Long eventId
     ) {
         return ticketService.hasActiveTicket(userId, eventId);
+    }
+
+    @GetMapping("/{ticketId}/valid")
+    public TicketValidationResponse validateTicket(
+            @PathVariable Long ticketId
+    ) {
+        return ticketService.validateTicket(ticketId);
     }
 }
