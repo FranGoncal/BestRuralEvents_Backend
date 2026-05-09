@@ -147,7 +147,8 @@ public class ReviewService {
                 review.getUserId(),
                 user.name(),
                 event.title(),
-                event.date(),
+                event.startDate(),
+                event.endDate(),
                 review.getRating(),
                 review.getComment(),
                 review.getCreatedAt()

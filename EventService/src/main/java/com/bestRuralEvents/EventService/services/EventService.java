@@ -2,9 +2,7 @@ package com.bestRuralEvents.EventService.services;
 
 import com.bestRuralEvents.EventService.DTO.*;
 import com.bestRuralEvents.EventService.mappers.EventMapper;
-import com.bestRuralEvents.EventService.models.Event;
-import com.bestRuralEvents.EventService.models.EventStatus;
-import com.bestRuralEvents.EventService.models.TicketMode;
+import com.bestRuralEvents.EventService.models.*;
 import com.bestRuralEvents.EventService.repositories.EventRepository;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
@@ -12,12 +10,16 @@ import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
+
+import static com.bestRuralEvents.EventService.mappers.EventMapper.toResponse;
 
 
 @Service
@@ -25,18 +27,53 @@ public class EventService {
     private static final Logger log = LoggerFactory.getLogger(EventService.class);
 
     private final EventRepository eventRepository;
+    private final ImageStorageService imageStorageService;
 
-    public EventService(EventRepository eventRepository) {
+    public EventService(
+            EventRepository eventRepository,
+            ImageStorageService imageStorageService
+    ) {
         this.eventRepository = eventRepository;
+        this.imageStorageService = imageStorageService;
     }
 
-    public EventResponse createEvent(EventRequest request, Long organizerId) {
-        validateDates(request.startDate(), request.endDate());
+    public EventResponse createEvent(
+            String title,
+            String location,
+            LocalDate startDate,
+            LocalDate endDate,
+            BigDecimal price,
+            String description,
+            MultipartFile image,
+            Long organizerId
+    ) {
+        validateDates(startDate, endDate);
 
-        Event event = EventMapper.toEntity(request, organizerId);
-        Event savedEvent = eventRepository.save(event);
+        Event event = new Event();
 
-        return EventMapper.toResponse(savedEvent);
+        event.setTitle(title.trim());
+        event.setLocation(location.trim());
+        event.setPrice(price);
+        event.setDescription(description);
+        event.setOrganizerId(organizerId);
+        event.setCapacity(100);
+        event.setCategory(EventCategory.FOOD);
+        event.setStatus(EventStatus.APPROVED);
+        event.setTicketMode(TicketMode.EVENT_PASS);
+
+        EventDate dates = new EventDate();
+        dates.setStartDate(startDate);
+        dates.setEndDate(endDate);
+        event.setDates(dates);
+
+        if (image != null && !image.isEmpty()) {
+            String imageUrl = imageStorageService.saveEventImage(image);
+            event.getImages().add(imageUrl);
+        }
+
+        Event saved = eventRepository.save(event);
+
+        return toResponse(saved);
     }
 
     public EventResponse updateEvent(Long eventId, EventRequest request, Long organizerId) {
@@ -54,14 +91,14 @@ public class EventService {
 
         Event savedEvent = eventRepository.save(event);
 
-        return EventMapper.toResponse(savedEvent);
+        return toResponse(savedEvent);
     }
 
     public EventResponse getEventById(Long eventId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
-        return EventMapper.toResponse(event);
+        return toResponse(event);
     }
 
     public EventListResponse getOrganizerEvents(Long organizerId) {

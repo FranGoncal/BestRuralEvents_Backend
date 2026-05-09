@@ -16,6 +16,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/events/**",
                                 "/internal/events/**",
+                                "/uploads/**",
                                 "/h2-console/**",
                                 "/actuator/**"
                         ).permitAll()

@@ -4,8 +4,13 @@ import com.bestRuralEvents.EventService.DTO.*;
 import com.bestRuralEvents.EventService.services.EventService;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @RestController
@@ -70,18 +75,36 @@ public class EventController {
         return eventService.getOrganizerEvents(userId);
     }
 
-    @PostMapping
-    public CreateEventApiResponse createEvent(
-            @Valid @RequestBody EventRequest request,
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<EventResponse> createEvent(
+            @RequestParam String title,
+            @RequestParam String location,
+
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate,
+
+            @RequestParam BigDecimal price,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) MultipartFile image,
             @RequestHeader("X-User-Id") Long organizerId
     ) {
-        EventResponse event = eventService.createEvent(request, organizerId);
-
-        return new CreateEventApiResponse(
-                true,
-                "Event created successfully.",
-                event
+        EventResponse response = eventService.createEvent(
+                title,
+                location,
+                startDate,
+                endDate,
+                price,
+                description,
+                image,
+                organizerId
         );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{eventId}")
