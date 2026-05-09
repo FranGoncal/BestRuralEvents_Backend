@@ -44,7 +44,7 @@ public class EventService {
             LocalDate endDate,
             BigDecimal price,
             String description,
-            MultipartFile image,
+            List<MultipartFile> images,
             Long organizerId
     ) {
         validateDates(startDate, endDate);
@@ -66,9 +66,13 @@ public class EventService {
         dates.setEndDate(endDate);
         event.setDates(dates);
 
-        if (image != null && !image.isEmpty()) {
-            String imageUrl = imageStorageService.saveEventImage(image);
-            event.getImages().add(imageUrl);
+        if (images != null && !images.isEmpty()) {
+            for (MultipartFile image : images) {
+                if (image != null && !image.isEmpty()) {
+                    String imageUrl = imageStorageService.saveEventImage(image);
+                    event.getImages().add(imageUrl);
+                }
+            }
         }
 
         Event saved = eventRepository.save(event);
@@ -76,9 +80,18 @@ public class EventService {
         return toResponse(saved);
     }
 
-    public EventResponse updateEvent(Long eventId, EventRequest request, Long organizerId) {
-        validateDates(request.startDate(), request.endDate());
-        validateCapacity(request);
+    public EventResponse updateEvent(
+            Long eventId,
+            String title,
+            String location,
+            LocalDate startDate,
+            LocalDate endDate,
+            BigDecimal price,
+            String description,
+            List<MultipartFile> images,
+            Long organizerId
+    ) {
+        validateDates(startDate, endDate);
 
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
@@ -87,7 +100,26 @@ public class EventService {
             throw new RuntimeException("You are not allowed to update this event");
         }
 
-        EventMapper.updateEntity(event, request);
+        event.setTitle(title.trim());
+        event.setLocation(location.trim());
+        event.setPrice(price);
+        event.setDescription(description);
+
+        EventDate dates = new EventDate();
+        dates.setStartDate(startDate);
+        dates.setEndDate(endDate);
+        event.setDates(dates);
+
+        if (images != null && !images.isEmpty()) {
+            event.getImages().clear();
+
+            for (MultipartFile image : images) {
+                if (image != null && !image.isEmpty()) {
+                    String imageUrl = imageStorageService.saveEventImage(image);
+                    event.getImages().add(imageUrl);
+                }
+            }
+        }
 
         Event savedEvent = eventRepository.save(event);
 

@@ -45,8 +45,10 @@ VALUES (
 
 INSERT INTO event_images (event_id, image_url)
 VALUES
-    (1, 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee'),
-    (1, 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee');
+    (1, 'https://ik.imgkit.net/3vlqs5axxjf/TW-Asia/ik-seo/uploadedImages/Features/Cover_Story/17S0856-241115/This-amazing-food-festival-will-let-you-feast-your.jpg?tr=w-780%2Ch-440%2Cfo-auto'),
+    (1, 'https://sustainablefoodtrust.org/wp-content/uploads/2023/05/Copy-of-New-website-image-size-34.jpg'),
+    (1, 'https://amuse-bouche.pt/wp-content/uploads/2021/04/Lisboafood_.jpg'),
+    (1, 'https://blog.italotreno.com/wp-content/uploads/2025/05/summer-food-festivals-italy.jpg');
 
 INSERT INTO event_daily_capacities (event_id, date, capacity)
 VALUES

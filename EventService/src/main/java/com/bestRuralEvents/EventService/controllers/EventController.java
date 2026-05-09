@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/events")
@@ -90,7 +91,9 @@ public class EventController {
 
             @RequestParam BigDecimal price,
             @RequestParam(required = false) String description,
-            @RequestParam(required = false) MultipartFile image,
+
+            @RequestParam(required = false) List<MultipartFile> images,
+
             @RequestHeader("X-User-Id") Long organizerId
     ) {
         EventResponse response = eventService.createEvent(
@@ -100,20 +103,46 @@ public class EventController {
                 endDate,
                 price,
                 description,
-                image,
+                images,
                 organizerId
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping("/{eventId}")
+    @PutMapping(
+            value = "/{eventId}",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public UpdateEventApiResponse updateEvent(
             @PathVariable Long eventId,
-            @Valid @RequestBody EventRequest request,
+            @RequestParam String title,
+            @RequestParam String location,
+
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate,
+
+            @RequestParam BigDecimal price,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) List<MultipartFile> images,
             @RequestHeader("X-User-Id") Long organizerId
     ) {
-        EventResponse event = eventService.updateEvent(eventId, request, organizerId);
+        EventResponse event = eventService.updateEvent(
+                eventId,
+                title,
+                location,
+                startDate,
+                endDate,
+                price,
+                description,
+                images,
+                organizerId
+        );
 
         return new UpdateEventApiResponse(
                 true,
