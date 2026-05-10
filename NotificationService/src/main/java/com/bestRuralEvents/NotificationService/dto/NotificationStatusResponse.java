@@ -1,4 +1,6 @@
 package com.bestRuralEvents.NotificationService.dto;
 
-public class NotificationStatusResponse {
+public record NotificationStatusResponse(
+        boolean hasUnreadNotifications
+) {
 }

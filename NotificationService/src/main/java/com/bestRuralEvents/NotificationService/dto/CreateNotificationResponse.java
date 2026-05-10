@@ -1,4 +1,7 @@
 package com.bestRuralEvents.NotificationService.dto;
 
-public class CreateNotificationResponse {
+public record CreateNotificationResponse(
+        Long id,
+        String message
+) {
 }

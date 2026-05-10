@@ -1,4 +1,8 @@
 package com.bestRuralEvents.NotificationService.models;
 
-public class DevicePlatform {
+
+public enum DevicePlatform {
+    ANDROID,
+    IOS,
+    WEB
 }
