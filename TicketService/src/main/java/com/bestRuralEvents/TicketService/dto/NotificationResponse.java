@@ -1,4 +1,7 @@
 package com.bestRuralEvents.TicketService.dto;
 
-public class NotificationResponse {
+public record NotificationResponse(
+        Long id,
+        String message
+) {
 }

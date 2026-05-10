@@ -6,8 +6,10 @@ import com.bestRuralEvents.TicketService.models.TicketMode;
 import com.bestRuralEvents.TicketService.models.TicketStatus;
 import com.bestRuralEvents.TicketService.models.TicketType;
 import com.bestRuralEvents.TicketService.proxies.ProxyEvent;
+import com.bestRuralEvents.TicketService.proxies.ProxyNotification;
 import com.bestRuralEvents.TicketService.proxies.ProxyPayment;
 import com.bestRuralEvents.TicketService.repositories.TicketRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -21,16 +23,18 @@ public class TicketService {
 
     private final TicketRepository ticketRepository;
     private final ProxyEvent proxyEvent;
-    private final ProxyPayment proxyPayment;
+    //private final ProxyPayment proxyPayment;
+
+    private final ProxyNotification proxyNotification;
 
     public TicketService(
             TicketRepository ticketRepository,
             ProxyEvent proxyEvent,
-            ProxyPayment proxyPayment
+            ProxyNotification proxyNotification
     ) {
         this.ticketRepository = ticketRepository;
         this.proxyEvent = proxyEvent;
-        this.proxyPayment = proxyPayment;
+        this.proxyNotification = proxyNotification;
     }
 
     public TicketResponse buyTicket(Long userId, CreateTicketRequest request) {
@@ -63,6 +67,17 @@ public class TicketService {
         ticket.setCurrency(event.currency());
 
         Ticket saved = ticketRepository.save(ticket);
+
+        sendNotificationSafely(
+                new NotificationRequest(
+                        userId,
+                        "Ticket purchased",
+                        "Your ticket for '" + event.title() + "' was purchased successfully.",
+                        "TICKET_PURCHASED",
+                        "TICKET",
+                        saved.getId()
+                )
+        );
 
         return toResponse(saved);
     }
@@ -200,6 +215,17 @@ public class TicketService {
 
         Ticket saved = ticketRepository.save(ticket);
 
+        sendNotificationSafely(
+                new NotificationRequest(
+                        userId,
+                        "Ticket cancelled",
+                        "Your ticket for '" + event.title() + "' was cancelled successfully.",
+                        "BOOKING_CANCELLED",
+                        "TICKET",
+                        saved.getId()
+                )
+        );
+
         return toResponse(saved);
     }
 
@@ -221,5 +247,13 @@ public class TicketService {
         LocalDate limitDate = event.startDate().minusDays(event.refundDeadlineDays());
 
         return LocalDate.now().isBefore(limitDate);
+    }
+
+    private void sendNotificationSafely(NotificationRequest request) {
+        try {
+            proxyNotification.createNotification(request);
+        } catch (Exception e) {
+            System.err.println("Failed to send notification: " + e.getMessage());
+        }
     }
 }
