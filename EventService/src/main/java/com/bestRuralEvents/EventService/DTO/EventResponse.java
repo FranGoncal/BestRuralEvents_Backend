@@ -6,7 +6,6 @@ import com.bestRuralEvents.EventService.models.TicketMode;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Currency;
 import java.util.List;
 
@@ -16,6 +15,7 @@ public record EventResponse(
         String description,
         Long organizerId,
         Integer capacity,
+        List<EventDayCapacityResponse> dailyCapacities,
         EventStatus status,
         EventCategory category,
         BigDecimal price,

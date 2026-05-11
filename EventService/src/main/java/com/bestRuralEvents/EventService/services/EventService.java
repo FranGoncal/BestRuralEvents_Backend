@@ -44,10 +44,20 @@ public class EventService {
             LocalDate endDate,
             BigDecimal price,
             String description,
+            Boolean refundable,
+            Integer refundDeadlineDays,
+            String refundPolicy,
+            TicketMode ticketMode,
+            Integer capacity,
+            List<LocalDate> dailyCapacityDates,
+            List<Integer> dailyCapacityValues,
             List<MultipartFile> images,
             Long organizerId
     ) {
         validateDates(startDate, endDate);
+        validateRefundPolicy(refundable, refundDeadlineDays, refundPolicy);
+
+        TicketMode resolvedTicketMode = ticketMode != null ? ticketMode : TicketMode.EVENT_PASS;
 
         Event event = new Event();
 
@@ -56,29 +66,37 @@ public class EventService {
         event.setPrice(price);
         event.setDescription(description);
         event.setOrganizerId(organizerId);
-        event.setCapacity(100);
+
         event.setCategory(EventCategory.FOOD);
         event.setStatus(EventStatus.APPROVED);
-        event.setTicketMode(TicketMode.EVENT_PASS);
+        event.setTicketMode(resolvedTicketMode);
+
+        event.setRefundable(Boolean.TRUE.equals(refundable));
+        event.setRefundDeadlineDays(Boolean.TRUE.equals(refundable) ? refundDeadlineDays : null);
+        event.setRefundPolicy(Boolean.TRUE.equals(refundable) ? refundPolicy : null);
 
         EventDate dates = new EventDate();
         dates.setStartDate(startDate);
         dates.setEndDate(endDate);
         event.setDates(dates);
 
-        if (images != null && !images.isEmpty()) {
-            for (MultipartFile image : images) {
-                if (image != null && !image.isEmpty()) {
-                    String imageUrl = imageStorageService.saveEventImage(image);
-                    event.getImages().add(imageUrl);
-                }
-            }
-        }
+        applyCapacity(
+                event,
+                resolvedTicketMode,
+                capacity,
+                dailyCapacityDates,
+                dailyCapacityValues,
+                startDate,
+                endDate
+        );
+
+        saveImages(event, images);
 
         Event saved = eventRepository.save(event);
 
         return toResponse(saved);
     }
+
 
     public EventResponse updateEvent(
             Long eventId,
@@ -100,6 +118,7 @@ public class EventService {
             throw new RuntimeException("You are not allowed to update this event");
         }
 
+
         event.setTitle(title.trim());
         event.setLocation(location.trim());
         event.setPrice(price);
@@ -112,13 +131,7 @@ public class EventService {
 
         if (images != null && !images.isEmpty()) {
             event.getImages().clear();
-
-            for (MultipartFile image : images) {
-                if (image != null && !image.isEmpty()) {
-                    String imageUrl = imageStorageService.saveEventImage(image);
-                    event.getImages().add(imageUrl);
-                }
-            }
+            saveImages(event, images);
         }
 
         Event savedEvent = eventRepository.save(event);
@@ -331,5 +344,91 @@ public class EventService {
         }
     }
 
+    private void validateRefundPolicy(
+            Boolean refundable,
+            Integer refundDeadlineDays,
+            String refundPolicy
+    ) {
+        if (!Boolean.TRUE.equals(refundable)) {
+            return;
+        }
+
+        if (refundDeadlineDays == null || refundDeadlineDays < 0) {
+            throw new RuntimeException("Refund deadline days must be zero or greater for refundable events");
+        }
+
+        if (refundPolicy == null || refundPolicy.trim().isEmpty()) {
+            throw new RuntimeException("Refund policy is required for refundable events");
+        }
+    }
+
+    private void applyCapacity(
+            Event event,
+            TicketMode ticketMode,
+            Integer capacity,
+            List<LocalDate> dailyCapacityDates,
+            List<Integer> dailyCapacityValues,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        if (ticketMode == TicketMode.EVENT_PASS) {
+            if (capacity == null || capacity < 1) {
+                throw new RuntimeException("Capacity must be at least 1 for event pass tickets");
+            }
+
+            event.setCapacity(capacity);
+            event.getDailyCapacities().clear();
+            return;
+        }
+
+        if (ticketMode == TicketMode.PER_DAY) {
+            if (dailyCapacityDates == null || dailyCapacityValues == null) {
+                throw new RuntimeException("Daily capacities are required for per-day tickets");
+            }
+
+            if (dailyCapacityDates.size() != dailyCapacityValues.size()) {
+                throw new RuntimeException("Daily capacity dates and values must have the same size");
+            }
+
+            event.getDailyCapacities().clear();
+
+            int totalCapacity = 0;
+
+            for (int i = 0; i < dailyCapacityDates.size(); i++) {
+                LocalDate date = dailyCapacityDates.get(i);
+                Integer dayCapacity = dailyCapacityValues.get(i);
+
+                if (date == null) {
+                    throw new RuntimeException("Daily capacity date is required");
+                }
+
+                if (dayCapacity == null || dayCapacity < 1) {
+                    throw new RuntimeException("Daily capacity must be at least 1");
+                }
+
+                if (date.isBefore(startDate) || date.isAfter(endDate)) {
+                    throw new RuntimeException("Daily capacity date must be inside event date range");
+                }
+
+                event.getDailyCapacities().add(new EventDayCapacity(date, dayCapacity));
+                totalCapacity += dayCapacity;
+            }
+
+            event.setCapacity(totalCapacity);
+        }
+    }
+
+    private void saveImages(Event event, List<MultipartFile> images) {
+        if (images == null || images.isEmpty()) {
+            return;
+        }
+
+        for (MultipartFile image : images) {
+            if (image != null && !image.isEmpty()) {
+                String imageUrl = imageStorageService.saveEventImage(image);
+                event.getImages().add(imageUrl);
+            }
+        }
+    }
 
 }

@@ -1,10 +1,12 @@
 package com.bestRuralEvents.EventService.mappers;
 
+import com.bestRuralEvents.EventService.DTO.EventDayCapacityResponse;
 import com.bestRuralEvents.EventService.DTO.EventRequest;
 import com.bestRuralEvents.EventService.DTO.EventResponse;
 import com.bestRuralEvents.EventService.models.*;
 
 import java.util.Currency;
+import java.util.List;
 
 public class EventMapper {
 
@@ -71,12 +73,12 @@ public class EventMapper {
         event.setPrice(request.price());
 
 
-        event.setRefundable(
+        /*event.setRefundable(
                 request.refundable() != null ? request.refundable() : false
         );
 
         event.setRefundDeadlineDays(request.refundDeadlineDays());
-        event.setRefundPolicy(request.refundPolicy());
+        event.setRefundPolicy(request.refundPolicy());*/
 
         event.setCategory(
                 request.category() != null
@@ -119,6 +121,12 @@ public class EventMapper {
                 event.getDescription(),
                 event.getOrganizerId(),
                 event.getCapacity(),
+                event.getDailyCapacities() == null
+                        ? List.of()
+                        : event.getDailyCapacities()
+                          .stream()
+                          .map(dc -> new EventDayCapacityResponse(dc.getDate(), dc.getCapacity()))
+                          .toList(),
                 event.getStatus(),
                 event.getCategory(),
                 event.getPrice(),

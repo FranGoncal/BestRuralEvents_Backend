@@ -1,6 +1,7 @@
 package com.bestRuralEvents.EventService.controllers;
 
 import com.bestRuralEvents.EventService.DTO.*;
+import com.bestRuralEvents.EventService.models.TicketMode;
 import com.bestRuralEvents.EventService.services.EventService;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -92,6 +93,16 @@ public class EventController {
             @RequestParam BigDecimal price,
             @RequestParam(required = false) String description,
 
+            @RequestParam(required = false, defaultValue = "false") Boolean refundable,
+            @RequestParam(required = false) Integer refundDeadlineDays,
+            @RequestParam(required = false) String refundPolicy,
+
+            @RequestParam(required = false, defaultValue = "EVENT_PASS") TicketMode ticketMode,
+            @RequestParam(required = false) Integer capacity,
+
+            @RequestParam(required = false) List<LocalDate> dailyCapacityDates,
+            @RequestParam(required = false) List<Integer> dailyCapacityValues,
+
             @RequestParam(required = false) List<MultipartFile> images,
 
             @RequestHeader("X-User-Id") Long organizerId
@@ -103,6 +114,13 @@ public class EventController {
                 endDate,
                 price,
                 description,
+                refundable,
+                refundDeadlineDays,
+                refundPolicy,
+                ticketMode,
+                capacity,
+                dailyCapacityDates,
+                dailyCapacityValues,
                 images,
                 organizerId
         );
@@ -129,6 +147,7 @@ public class EventController {
 
             @RequestParam BigDecimal price,
             @RequestParam(required = false) String description,
+
             @RequestParam(required = false) List<MultipartFile> images,
             @RequestHeader("X-User-Id") Long organizerId
     ) {
