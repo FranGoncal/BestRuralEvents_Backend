@@ -41,11 +41,11 @@ public class TicketController {
     }
 
     @GetMapping("/event/{eventId}")
-    public List<TicketResponse> getEventTickets(
+    public EventTicketsManagementResponse getEventTickets(
             @RequestHeader("X-User-Id") Long organizerId,
             @PathVariable Long eventId
     ) {
-        return ticketService.getEventTickets(organizerId, eventId);
+        return ticketService.getEventTicketsForManagement(organizerId, eventId);
     }
 
     @GetMapping("/check-ownership")

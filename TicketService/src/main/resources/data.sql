@@ -1,6 +1,7 @@
 INSERT INTO tickets (
     user_id,
     event_id,
+    quantity,
     ticket_mode,
     status,
     validation_token,
@@ -12,6 +13,7 @@ VALUES
     (
         5,
         1,
+        2,
         'PER_DAY',
         'ACTIVE',
         'test-token-ticket-1',
@@ -21,6 +23,7 @@ VALUES
     ),
     (
         5,
+        1,
         1,
         'EVENT_PASS',
         'ACTIVE',

@@ -8,6 +8,7 @@ import com.bestRuralEvents.TicketService.models.TicketType;
 import com.bestRuralEvents.TicketService.proxies.ProxyEvent;
 import com.bestRuralEvents.TicketService.proxies.ProxyNotification;
 import com.bestRuralEvents.TicketService.proxies.ProxyPayment;
+import com.bestRuralEvents.TicketService.proxies.ProxyUser;
 import com.bestRuralEvents.TicketService.repositories.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @Service
 public class TicketService {
 
+    private final ProxyUser proxyUser;
     private final TicketRepository ticketRepository;
     private final ProxyEvent proxyEvent;
     //private final ProxyPayment proxyPayment;
@@ -30,11 +32,50 @@ public class TicketService {
     public TicketService(
             TicketRepository ticketRepository,
             ProxyEvent proxyEvent,
-            ProxyNotification proxyNotification
+            ProxyNotification proxyNotification,
+            ProxyUser proxyUser
     ) {
         this.ticketRepository = ticketRepository;
         this.proxyEvent = proxyEvent;
         this.proxyNotification = proxyNotification;
+        this.proxyUser = proxyUser;
+    }
+
+    public EventTicketsManagementResponse getEventTicketsForManagement(Long organizerId, Long eventId) {
+        EventResponse event = proxyEvent.getEventById(eventId);
+
+        if (event == null) {
+            throw new RuntimeException("Event not found");
+        }
+
+        if (!event.organizerId().equals(organizerId)) {
+            throw new RuntimeException("You are not allowed to manage tickets for this event");
+        }
+
+        List<Ticket> tickets = ticketRepository.findByEventIdOrderByCreatedAtDesc(eventId);
+
+        int ticketsSold = tickets.stream()
+                .filter(ticket -> ticket.getStatus() != TicketStatus.CANCELLED)
+                .mapToInt(ticket -> ticket.getQuantity() == null ? 1 : ticket.getQuantity())
+                .sum();
+
+        Integer capacity = event.capacity();
+
+        Integer ticketsAvailable = capacity == null
+                ? null
+                : Math.max(capacity - ticketsSold, 0);
+
+        List<TicketResponse> responses = tickets.stream()
+                .map(this::toResponse)
+                .toList();
+
+        return new EventTicketsManagementResponse(
+                "Event tickets loaded successfully.",
+                capacity,
+                ticketsSold,
+                ticketsAvailable,
+                responses
+        );
     }
 
     public TicketResponse buyTicket(Long userId, CreateTicketRequest request) {
@@ -42,23 +83,16 @@ public class TicketService {
 
         validateTicketRequest(event, request);
 
-        /*
-        PaymentResponse payment = proxyPayment.createPayment(
-                new PaymentRequest(
-                        userId,
-                        event.id(),
-                        event.price(),
-                        event.currency()
-                )
-        );
+        int quantity = request.quantity() == null ? 1 : request.quantity();
 
-        if (!payment.status().equals("SUCCESS")) {
-            throw new RuntimeException("Payment failed");
-        }*/
+        if (quantity <= 0) {
+            throw new RuntimeException("Quantity must be at least 1");
+        }
 
         Ticket ticket = new Ticket();
         ticket.setUserId(userId);
         ticket.setEventId(event.id());
+        ticket.setQuantity(quantity);
         ticket.setTicketMode(event.ticketMode());
         ticket.setSelectedDays(request.selectedDays() == null ? List.of() : request.selectedDays());
         ticket.setStatus(TicketStatus.ACTIVE);
@@ -67,17 +101,6 @@ public class TicketService {
         ticket.setCurrency(event.currency());
 
         Ticket saved = ticketRepository.save(ticket);
-
-        sendNotificationSafely(
-                new NotificationRequest(
-                        userId,
-                        "Ticket purchased",
-                        "Your ticket for '" + event.title() + "' was purchased successfully.",
-                        "TICKET_PURCHASED",
-                        "TICKET",
-                        saved.getId()
-                )
-        );
 
         return toResponse(saved);
     }
@@ -112,6 +135,7 @@ public class TicketService {
 
     private TicketResponse toResponse(Ticket ticket) {
         EventResponse event = proxyEvent.getEventById(ticket.getEventId());
+        UserResponse user = proxyUser.getUserById(ticket.getUserId());
 
         String imageUrl = "";
 
@@ -139,9 +163,9 @@ public class TicketService {
                 ticket.getCreatedAt(),
                 canCancel(ticket, event),
                 ticket.getStatus() == TicketStatus.ACTIVE || ticket.getStatus() == TicketStatus.USED,
-                1,
-                "",
-                "",
+                ticket.getQuantity(),
+                user.name(),
+                user.email(),
                 ticket.getCreatedAt(),
                 ticket.getStatus()
         );
@@ -207,9 +231,9 @@ public class TicketService {
 
         EventResponse event = proxyEvent.getEventById(ticket.getEventId());
 
-        if (!canCancel(ticket, event)) {
+        /*if (!canCancel(ticket, event)) {
             throw new RuntimeException("This ticket can no longer be cancelled");
-        }
+        }*/
 
         ticket.setStatus(TicketStatus.CANCELLED);
 
@@ -219,7 +243,7 @@ public class TicketService {
                 new NotificationRequest(
                         userId,
                         "Ticket cancelled",
-                        "Your ticket for '" + event.title() + "' was cancelled successfully.",
+                        "The ticket for '" + event.title() + "' was cancelled successfully.",
                         "BOOKING_CANCELLED",
                         "TICKET",
                         saved.getId()
@@ -256,4 +280,5 @@ public class TicketService {
             System.err.println("Failed to send notification: " + e.getMessage());
         }
     }
+
 }
