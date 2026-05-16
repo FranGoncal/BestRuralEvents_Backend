@@ -254,6 +254,13 @@ public class EventService {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("price"), maxPrice));
             }
 
+            if (minRating != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(
+                        root.get("averageRating"),
+                        minRating
+                ));
+            }
+
             if (activityType != null && !activityType.trim().isEmpty()) {
                 predicates.add(criteriaBuilder.equal(
                         root.get("category").as(String.class),

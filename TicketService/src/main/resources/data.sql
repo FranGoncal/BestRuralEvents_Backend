@@ -11,7 +11,7 @@ INSERT INTO tickets (
 )
 VALUES
     (
-        5,
+        1,
         1,
         2,
         'PER_DAY',
@@ -22,7 +22,7 @@ VALUES
         CURRENT_TIMESTAMP
     ),
     (
-        5,
+        1,
         1,
         1,
         'EVENT_PASS',
