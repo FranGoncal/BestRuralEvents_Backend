@@ -27,5 +27,7 @@ public record EventResponse(
         Boolean refundable,
         Integer refundDeadlineDays,
         String refundPolicy,
-        Integer capacity
+
+        Integer capacity,
+        List<EventDailyCapacityResponse> dailyCapacities
 ) {}

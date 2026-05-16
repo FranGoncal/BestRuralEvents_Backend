@@ -23,5 +23,6 @@ public record TicketResponse(
         String customerName,
         String customerEmail,
         LocalDateTime createdAt,
-        TicketStatus status
+        TicketStatus status,
+        List<LocalDate> selectedDays
 ) {}

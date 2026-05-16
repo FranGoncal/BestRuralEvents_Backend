@@ -2,8 +2,9 @@ package com.bestRuralEvents.AuthService.Service;
 
 import com.bestRuralEvents.AuthService.DTO.*;
 import com.bestRuralEvents.AuthService.Model.AuthUser;
-import com.bestRuralEvents.AuthService.Model.Role;
+import com.bestRuralEvents.AuthService.DTO.Role;
 import com.bestRuralEvents.AuthService.Repository.AuthUserRepository;
+import com.bestRuralEvents.AuthService.proxy.UserProxy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,18 +15,18 @@ public class AuthService {
     private final AuthUserRepository authUserRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final UserServiceClient userServiceClient;
+    private final UserProxy userProxy;
 
     public AuthService(
             AuthUserRepository authUserRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
-            UserServiceClient userServiceClient
+            UserProxy userProxy
     ) {
         this.authUserRepository = authUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
-        this.userServiceClient = userServiceClient;
+        this.userProxy = userProxy;
     }
 
     @Transactional
@@ -37,6 +38,7 @@ public class AuthService {
         AuthUser authUser = new AuthUser();
         authUser.setEmail(request.email());
         authUser.setPasswordHash(passwordEncoder.encode(request.password()));
+        System.out.println("Encoded password: " + authUser.getPasswordHash());
         authUser.setRole(Role.USER);
         authUser.setEnabled(true);
 
@@ -49,7 +51,7 @@ public class AuthService {
                 request.birthDate()
         );
 
-        userServiceClient.createUserProfile(profileRequest);
+        userProxy.createUserProfile(profileRequest);
 
         return new SignupResponse(
                 "User registered successfully",

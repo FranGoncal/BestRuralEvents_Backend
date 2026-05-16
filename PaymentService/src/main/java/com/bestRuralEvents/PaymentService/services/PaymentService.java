@@ -65,6 +65,7 @@ public class PaymentService {
 
         CreateTicketRequest ticketRequest = new CreateTicketRequest(
                 request.eventId(),
+                request.quantity(),
                 request.selectedDays()
         );
 

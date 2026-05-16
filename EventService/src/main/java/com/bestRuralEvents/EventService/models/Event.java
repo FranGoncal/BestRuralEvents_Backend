@@ -1,9 +1,6 @@
 package com.bestRuralEvents.EventService.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,9 +11,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "events")
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class Event {
 
     @Id
@@ -125,5 +119,182 @@ public class Event {
         if (this.status == EventStatus.APPROVED && this.publishedAt == null) {
             this.publishedAt = LocalDateTime.now();
         }
+    }
+
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Boolean getRefundable() {
+        return refundable;
+    }
+
+    public void setRefundable(Boolean refundable) {
+        this.refundable = refundable;
+    }
+
+    public Integer getRefundDeadlineDays() {
+        return refundDeadlineDays;
+    }
+
+    public void setRefundDeadlineDays(Integer refundDeadlineDays) {
+        this.refundDeadlineDays = refundDeadlineDays;
+    }
+
+    public String getRefundPolicy() {
+        return refundPolicy;
+    }
+
+    public void setRefundPolicy(String refundPolicy) {
+        this.refundPolicy = refundPolicy;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Long getOrganizerId() {
+        return organizerId;
+    }
+
+    public void setOrganizerId(Long organizerId) {
+        this.organizerId = organizerId;
+    }
+
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
+    }
+
+    public List<EventDayCapacity> getDailyCapacities() {
+        return dailyCapacities;
+    }
+
+    public void setDailyCapacities(List<EventDayCapacity> dailyCapacities) {
+        this.dailyCapacities = dailyCapacities;
+    }
+
+    public EventStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(EventStatus status) {
+        this.status = status;
+    }
+
+    public EventCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(EventCategory category) {
+        this.category = category;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public EventDate getDates() {
+        return dates;
+    }
+
+    public void setDates(EventDate dates) {
+        this.dates = dates;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
+
+    public TicketMode getTicketMode() {
+        return ticketMode;
+    }
+
+    public void setTicketMode(TicketMode ticketMode) {
+        this.ticketMode = ticketMode;
+    }
+
+    public Double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
+    }
+
+    public Integer getTotalReviews() {
+        return totalReviews;
+    }
+
+    public void setTotalReviews(Integer totalReviews) {
+        this.totalReviews = totalReviews;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getPublishedAt() {
+        return publishedAt;
+    }
+
+    public void setPublishedAt(LocalDateTime publishedAt) {
+        this.publishedAt = publishedAt;
     }
 }

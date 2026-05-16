@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="container">
+    <h1>Admin Dashboard</h1>
+
+    <p>
+        Logged in as:
+        <strong th:text="${adminEmail}">admin@email.com</strong>
+    </p>
+
+    <div class="cards">
+        <a class="card" th:href="@{/admin/faqs}">
+            <h2>Manage FAQs</h2>
+            <p>Create, edit and delete FAQ entries.</p>
+        </a>
+
+        <a class="card" th:href="@{/admin/help-messages}">
+            <h2>Help Messages</h2>
+            <p>Read messages sent by users.</p>
+        </a>
+    </div>
+
+    <form method="post" th:action="@{/admin/logout}">
+        <button type="submit" class="secondary">Logout</button>
+    </form>
+</div>
+</body>
+</html>

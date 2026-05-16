@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>FAQ Form</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="container small">
+    <h1 th:text="${faq.id == null ? 'Create FAQ' : 'Edit FAQ'}">FAQ</h1>
+
+    <div class="page-actions">
+        <a class="link-button" th:href="@{/admin/faqs}">← Back to FAQs</a>
+    </div>
+
+    <form method="post"
+          th:action="${faq.id == null} ? @{/admin/faqs} : @{/admin/faqs/{id}(id=${faq.id})}"
+          th:object="${faq}">
+
+        <label>Question</label>
+        <input type="text" th:field="*{question}" required>
+
+        <label>Answer</label>
+        <textarea th:field="*{answer}" rows="8" required></textarea>
+
+        <label>Display Order</label>
+        <input type="number" th:field="*{displayOrder}" required>
+
+        <label class="checkbox">
+            <input type="checkbox" th:field="*{active}">
+            Active
+        </label>
+
+        <button type="submit">Save</button>
+    </form>
+</div>
+</body>
+</html>

@@ -1,16 +1,8 @@
 package com.bestRuralEvents.ContentService.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 public class HelpMessage {
 
@@ -20,6 +12,9 @@ public class HelpMessage {
 
     @Column(nullable = false)
     private String userId;
+
+    @Column(nullable = false, length = 150)
+    private String email;
 
     @Column(nullable = false, length = 150)
     private String subject;
@@ -34,12 +29,71 @@ public class HelpMessage {
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // Custom constructor for creation
-    public HelpMessage(String userId, String subject, String message) {
+    public HelpMessage() {
+    }
+
+    public HelpMessage(String userId, String email, String subject, String message) {
         this.userId = userId;
+        this.email = email;
         this.subject = subject;
         this.message = message;
         this.status = HelpMessageStatus.OPEN;
         this.createdAt = LocalDateTime.now();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public HelpMessageStatus getStatus() {
+        return status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public void setStatus(HelpMessageStatus status) {
+        this.status = status;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

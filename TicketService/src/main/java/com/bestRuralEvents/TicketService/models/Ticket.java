@@ -1,9 +1,6 @@
 package com.bestRuralEvents.TicketService.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,9 +10,6 @@ import java.util.Currency;
 import java.util.List;
 
 @Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "tickets")
 public class Ticket {
 
@@ -60,6 +54,10 @@ public class Ticket {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    public Ticket() {
+
+    }
+
     @PrePersist
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -71,5 +69,108 @@ public class Ticket {
         if (this.quantity == null) {
             this.quantity = 1;
         }
+    }
+
+
+    public Ticket(Long id, Long userId, Long eventId, Integer quantity, TicketMode ticketMode, List<LocalDate> selectedDays, TicketStatus status, String validationToken, BigDecimal pricePaid, Currency currency, LocalDateTime createdAt) {
+        this.id = id;
+        this.userId = userId;
+        this.eventId = eventId;
+        this.quantity = quantity;
+        this.ticketMode = ticketMode;
+        this.selectedDays = selectedDays;
+        this.status = status;
+        this.validationToken = validationToken;
+        this.pricePaid = pricePaid;
+        this.currency = currency;
+        this.createdAt = createdAt;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public Long getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public TicketMode getTicketMode() {
+        return ticketMode;
+    }
+
+    public void setTicketMode(TicketMode ticketMode) {
+        this.ticketMode = ticketMode;
+    }
+
+    public List<LocalDate> getSelectedDays() {
+        return selectedDays;
+    }
+
+    public void setSelectedDays(List<LocalDate> selectedDays) {
+        this.selectedDays = selectedDays;
+    }
+
+    public TicketStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TicketStatus status) {
+        this.status = status;
+    }
+
+    public String getValidationToken() {
+        return validationToken;
+    }
+
+    public void setValidationToken(String validationToken) {
+        this.validationToken = validationToken;
+    }
+
+    public BigDecimal getPricePaid() {
+        return pricePaid;
+    }
+
+    public void setPricePaid(BigDecimal pricePaid) {
+        this.pricePaid = pricePaid;
+    }
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

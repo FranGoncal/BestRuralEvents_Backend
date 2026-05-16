@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Help Message Detail</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="container small">
+    <h1>Help Message</h1>
+
+    <div class="page-actions">
+        <a class="link-button" th:href="@{/admin/help-messages}">
+            ← Back to messages
+        </a>
+    </div>
+
+    <div class="panel">
+        <p><strong>ID:</strong> <span th:text="${message.id}"></span></p>
+        <p><strong>User ID:</strong> <span th:text="${message.userId}"></span></p>
+        <p><strong>Email:</strong> <span th:text="${message.email}"></span></p>
+        <p><strong>Subject:</strong> <span th:text="${message.subject}"></span></p>
+        <p><strong>Status:</strong> <span th:text="${message.status}"></span></p>
+        <p><strong>Created:</strong> <span th:text="${message.createdAt}"></span></p>
+
+        <hr>
+
+        <p class="message-body" th:text="${message.message}"></p>
+    </div>
+
+    <form method="post"
+          th:action="@{/admin/help-messages/{id}/status(id=${message.id})}">
+
+        <label>Update status</label>
+
+        <select name="status">
+            <option value="OPEN" th:selected="${message.status == 'OPEN'}">
+                OPEN
+            </option>
+
+            <option value="READ" th:selected="${message.status == 'READ'}">
+                READ
+            </option>
+
+            <option value="CLOSED" th:selected="${message.status == 'CLOSED'}">
+                CLOSED
+            </option>
+        </select>
+
+        <button type="submit" class="primary-button">
+            Update Status
+        </button>
+    </form>
+</div>
+</body>
+</html>

@@ -62,4 +62,13 @@ public class TicketController {
     ) {
         return ticketService.validateTicket(ticketId);
     }
+
+
+    @PostMapping("/{ticketId}/refund")
+    public TicketResponse refundTicketAsOrganizer(
+            @RequestHeader("X-User-Id") Long organizerId,
+            @PathVariable Long ticketId
+    ) {
+        return ticketService.refundTicketAsOrganizer(organizerId, ticketId);
+    }
 }

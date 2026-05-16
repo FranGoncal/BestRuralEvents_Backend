@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Help Messages</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="container">
+    <h1>Help Messages</h1>
+
+    <div class="page-actions">
+        <a class="link-button" th:href="@{/admin/dashboard}">
+            ← Dashboard
+        </a>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Email</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th></th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="message : ${messages}">
+            <td th:text="${message.id}"></td>
+            <td th:text="${message.email}"></td>
+            <td th:text="${message.subject}"></td>
+            <td th:text="${message.status}"></td>
+            <td th:text="${message.createdAt}"></td>
+            <td>
+                <a class="link-button small"
+                   th:href="@{/admin/help-messages/{id}(id=${message.id})}">
+                    View
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

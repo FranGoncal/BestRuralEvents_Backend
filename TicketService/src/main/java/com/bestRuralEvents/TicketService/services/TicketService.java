@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 import java.util.UUID;
@@ -54,16 +55,23 @@ public class TicketService {
 
         List<Ticket> tickets = ticketRepository.findByEventIdOrderByCreatedAtDesc(eventId);
 
-        int ticketsSold = tickets.stream()
+        List<Ticket> activeTickets = tickets.stream()
                 .filter(ticket -> ticket.getStatus() != TicketStatus.CANCELLED)
-                .mapToInt(ticket -> ticket.getQuantity() == null ? 1 : ticket.getQuantity())
+                .toList();
+
+        List<EventTicketDayStatsResponse> dayStats = buildDayStats(event, activeTickets);
+
+        int totalTicketsSold = dayStats.stream()
+                .mapToInt(EventTicketDayStatsResponse::ticketsSold)
                 .sum();
 
-        Integer capacity = event.capacity();
-
-        Integer ticketsAvailable = capacity == null
+        Integer totalTicketsAvailable = event.capacity() == null
                 ? null
-                : Math.max(capacity - ticketsSold, 0);
+                : dayStats.stream()
+                  .map(EventTicketDayStatsResponse::ticketsAvailable)
+                  .filter(value -> value != null)
+                  .mapToInt(Integer::intValue)
+                  .sum();
 
         List<TicketResponse> responses = tickets.stream()
                 .map(this::toResponse)
@@ -71,14 +79,20 @@ public class TicketService {
 
         return new EventTicketsManagementResponse(
                 "Event tickets loaded successfully.",
-                capacity,
-                ticketsSold,
-                ticketsAvailable,
+                event.id(),
+                event.title(),
+                event.ticketMode(),
+                event.capacity(),
+                totalTicketsSold,
+                totalTicketsAvailable,
+                dayStats,
                 responses
         );
     }
 
     public TicketResponse buyTicket(Long userId, CreateTicketRequest request) {
+        System.out.println("BUY TICKET REQUEST QUANTITY = " + request.quantity());
+        System.out.println("BUY TICKET REQUEST SELECTED DAYS = " + request.selectedDays());
         EventResponse event = proxyEvent.getEventById(request.eventId());
 
         validateTicketRequest(event, request);
@@ -103,6 +117,66 @@ public class TicketService {
         Ticket saved = ticketRepository.save(ticket);
 
         return toResponse(saved);
+    }
+
+    private List<EventTicketDayStatsResponse> buildDayStats(EventResponse event, List<Ticket> activeTickets) {
+        if (event.startDate() == null || event.endDate() == null) {
+            return List.of();
+        }
+
+        List<EventTicketDayStatsResponse> result = new ArrayList<>();
+
+        LocalDate current = event.startDate();
+
+        while (!current.isAfter(event.endDate())) {
+            LocalDate day = current;
+
+            Integer dayCapacity = getCapacityForDay(event, day);
+
+            int soldForDay = activeTickets.stream()
+                    .filter(ticket -> ticketAppliesToDay(ticket, event.ticketMode(), day))
+                    .mapToInt(ticket -> ticket.getQuantity() == null ? 1 : ticket.getQuantity())
+                    .sum();
+
+            Integer available = dayCapacity == null
+                    ? null
+                    : Math.max(dayCapacity - soldForDay, 0);
+
+            result.add(new EventTicketDayStatsResponse(
+                    day,
+                    dayCapacity,
+                    soldForDay,
+                    available
+            ));
+
+            current = current.plusDays(1);
+        }
+
+        return result;
+    }
+    private Integer getCapacityForDay(EventResponse event, LocalDate day) {
+        if (event.dailyCapacities() == null || event.dailyCapacities().isEmpty()) {
+            return event.capacity();
+        }
+
+        return event.dailyCapacities()
+                .stream()
+                .filter(dailyCapacity -> dailyCapacity.date().equals(day))
+                .map(EventDailyCapacityResponse::capacity)
+                .findFirst()
+                .orElse(event.capacity());
+    }
+
+    private boolean ticketAppliesToDay(Ticket ticket, TicketMode ticketMode, LocalDate day) {
+        if (ticketMode == TicketMode.EVENT_PASS) {
+            return true;
+        }
+
+        if (ticketMode == TicketMode.PER_DAY) {
+            return ticket.getSelectedDays() != null && ticket.getSelectedDays().contains(day);
+        }
+
+        return false;
     }
 
 
@@ -167,7 +241,8 @@ public class TicketService {
                 user.name(),
                 user.email(),
                 ticket.getCreatedAt(),
-                ticket.getStatus()
+                ticket.getStatus(),
+                ticket.getSelectedDays()
         );
     }
 
@@ -271,6 +346,38 @@ public class TicketService {
         LocalDate limitDate = event.startDate().minusDays(event.refundDeadlineDays());
 
         return LocalDate.now().isBefore(limitDate);
+    }
+
+    public TicketResponse refundTicketAsOrganizer(Long organizerId, Long ticketId) {
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+
+        EventResponse event = proxyEvent.getEventById(ticket.getEventId());
+
+        if (!event.organizerId().equals(organizerId)) {
+            throw new RuntimeException("You are not allowed to refund this ticket");
+        }
+
+        if (ticket.getStatus() == TicketStatus.CANCELLED) {
+            throw new RuntimeException("Ticket is already cancelled");
+        }
+
+        ticket.setStatus(TicketStatus.CANCELLED);
+
+        Ticket saved = ticketRepository.save(ticket);
+
+        sendNotificationSafely(
+                new NotificationRequest(
+                        ticket.getUserId(),
+                        "Ticket refunded",
+                        "Your ticket for '" + event.title() + "' was refunded by the organizer.",
+                        "BOOKING_CANCELLED",
+                        "TICKET",
+                        saved.getId()
+                )
+        );
+
+        return toResponse(saved);
     }
 
     private void sendNotificationSafely(NotificationRequest request) {

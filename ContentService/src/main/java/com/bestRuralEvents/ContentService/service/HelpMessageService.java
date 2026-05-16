@@ -2,7 +2,10 @@ package com.bestRuralEvents.ContentService.service;
 
 import com.bestRuralEvents.ContentService.dto.HelpMessageAdminResponse;
 import com.bestRuralEvents.ContentService.dto.HelpMessageRequest;
+import com.bestRuralEvents.ContentService.dto.UserResponse;
 import com.bestRuralEvents.ContentService.models.HelpMessage;
+import com.bestRuralEvents.ContentService.models.HelpMessageStatus;
+import com.bestRuralEvents.ContentService.proxy.UserClient;
 import com.bestRuralEvents.ContentService.repository.HelpMessageRepository;
 import org.springframework.stereotype.Service;
 
@@ -12,14 +15,24 @@ import java.util.List;
 public class HelpMessageService {
 
     private final HelpMessageRepository helpMessageRepository;
+    private final UserClient userClient;
 
-    public HelpMessageService(HelpMessageRepository helpMessageRepository) {
+    public HelpMessageService(
+            HelpMessageRepository helpMessageRepository,
+            UserClient userClient
+    ) {
         this.helpMessageRepository = helpMessageRepository;
+        this.userClient = userClient;
     }
 
     public HelpMessage create(HelpMessageRequest request) {
+        Long userId = Long.valueOf(request.userId());
+
+        UserResponse user = userClient.getUserById(userId);
+
         HelpMessage helpMessage = new HelpMessage(
                 request.userId(),
+                user.email(),
                 request.subject(),
                 request.message()
         );
@@ -41,10 +54,22 @@ public class HelpMessageService {
         return toAdminResponse(message);
     }
 
+    public HelpMessageAdminResponse updateStatus(Long id, String status) {
+        HelpMessage message = helpMessageRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Help message not found with id: " + id));
+
+        message.setStatus(HelpMessageStatus.valueOf(status));
+
+        HelpMessage saved = helpMessageRepository.save(message);
+
+        return toAdminResponse(saved);
+    }
+
     private HelpMessageAdminResponse toAdminResponse(HelpMessage message) {
         return new HelpMessageAdminResponse(
                 message.getId(),
                 message.getUserId(),
+                message.getEmail(),
                 message.getSubject(),
                 message.getMessage(),
                 message.getStatus(),

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>FAQs</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="container">
+    <h1>FAQs</h1>
+
+    <div class="page-actions">
+        <a class="link-button" th:href="@{/admin/dashboard}">← Dashboard</a>
+        <a class="link-button primary" th:href="@{/admin/faqs/new}">Add FAQ</a>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Question</th>
+            <th>Active</th>
+            <th>Order</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="faq : ${faqs}">
+            <td th:text="${faq.id}"></td>
+            <td th:text="${faq.question}"></td>
+            <td th:text="${faq.active}"></td>
+            <td th:text="${faq.displayOrder}"></td>
+            <td>
+                <div class="action-cell">
+                    <a class="link-button small" th:href="@{/admin/faqs/{id}/edit(id=${faq.id})}">
+                        Edit
+                    </a>
+
+                    <form method="post"
+                          th:action="@{/admin/faqs/{id}/delete(id=${faq.id})}"
+                          class="inline-form">
+                        <button type="submit" class="danger">Delete</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
