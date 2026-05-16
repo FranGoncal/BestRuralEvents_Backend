@@ -24,6 +24,7 @@ public class InternalNotificationController {
     public CreateNotificationResponse createNotification(
             @Valid @RequestBody CreateNotificationRequest request
     ) {
+        System.out.println("NOTIFY!!");
         Notification notification = notificationService.createAndSend(request);
 
         return new CreateNotificationResponse(

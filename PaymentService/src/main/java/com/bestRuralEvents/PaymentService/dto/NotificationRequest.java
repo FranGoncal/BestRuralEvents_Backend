@@ -1,7 +1,11 @@
 package com.bestRuralEvents.PaymentService.dto;
 
 public record NotificationRequest(
-        Long userId,
+        Long recipientUserId,
         String title,
-        String message
-) {}
+        String text,
+        String type,
+        String relatedEntityType,
+        Long relatedEntityId
+) {
+}

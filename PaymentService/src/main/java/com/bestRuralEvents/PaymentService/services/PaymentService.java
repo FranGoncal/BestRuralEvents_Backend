@@ -75,7 +75,8 @@ public class PaymentService {
         payment.setBookingReference(ticket.bookingReference());
         paymentRepository.save(payment);
 
-        sendNotificationBestEffort(userId, ticket.bookingReference());
+        System.out.println("Payment succeeded--------------------------------------------------");
+        sendNotificationBestEffort(userId, payment.getAmount().toString());
 
         return new PaymentResponse(
                 true,
@@ -104,15 +105,21 @@ public class PaymentService {
 
     private void sendNotificationBestEffort(Long userId, String bookingReference) {
         try {
+            System.out.println("Attempting to send notification...");
             notificationClient.sendNotification(
                     new NotificationRequest(
                             userId,
                             "Booking confirmed",
-                            "Your booking was confirmed. Reference: " + bookingReference
+                            "Your booking was confirmed. Paid: " + bookingReference + "€",
+                            "GENERAL",
+                            "TICKET",
+                            null
+
                     )
             );
-        } catch (Exception ignored) {
-            // MVP: notification failure should not cancel payment/ticket.
+            System.out.println("Notification sent successfully.");
+        } catch (Exception e) {
+            System.err.println("Failed to send notification: " + e.getMessage());
         }
     }
 }
