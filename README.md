@@ -253,3 +253,6 @@ Possible responsibilities include:
 
 This service makes sense if promotions are treated as a separate business concern instead of being stored directly inside the Event Service.
 
+---
+### Documentation
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/FranGoncal/BestRuralEvents_Backend)
