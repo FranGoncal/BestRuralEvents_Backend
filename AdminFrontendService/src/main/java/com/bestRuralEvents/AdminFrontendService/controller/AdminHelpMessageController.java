@@ -4,6 +4,7 @@ import com.bestRuralEvents.AdminFrontendService.dto.HelpMessageStatusUpdateReque
 import com.bestRuralEvents.AdminFrontendService.proxy.ContentClient;
 import com.bestRuralEvents.AdminFrontendService.security.AdminTokenProvider;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,16 +13,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/admin/help-messages")
 public class AdminHelpMessageController {
 
-    private final ContentClient contentClient;
-    private final AdminTokenProvider tokenProvider;
+    @Autowired
+    private ContentClient contentClient;
 
-    public AdminHelpMessageController(
-            ContentClient contentClient,
-            AdminTokenProvider tokenProvider
-    ) {
-        this.contentClient = contentClient;
-        this.tokenProvider = tokenProvider;
-    }
+    @Autowired
+    private AdminTokenProvider tokenProvider;
 
     @GetMapping
     public String list(Model model, HttpSession session) {

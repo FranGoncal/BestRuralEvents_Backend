@@ -5,17 +5,15 @@ import com.bestRuralEvents.ContentService.dto.FaqListResponse;
 import com.bestRuralEvents.ContentService.models.Faq;
 import com.bestRuralEvents.ContentService.service.FaqService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/content/faq")
 public class FaqController {
 
-    private final FaqService faqService;
-
-    public FaqController(FaqService faqService) {
-        this.faqService = faqService;
-    }
+    @Autowired
+    private FaqService faqService;
 
     // Existing public endpoint - do not change
     @GetMapping

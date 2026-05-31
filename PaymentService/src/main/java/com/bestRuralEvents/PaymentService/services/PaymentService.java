@@ -6,6 +6,7 @@ import com.bestRuralEvents.PaymentService.models.PaymentStatus;
 import com.bestRuralEvents.PaymentService.proxy.ProxyNotification;
 import com.bestRuralEvents.PaymentService.proxy.ProxyTicket;
 import com.bestRuralEvents.PaymentService.repository.PaymentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,19 +15,14 @@ import java.util.UUID;
 @Service
 public class PaymentService {
 
-    private final PaymentRepository paymentRepository;
-    private final ProxyTicket proxyTicket;
-    private final ProxyNotification notificationClient;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
-    public PaymentService(
-            PaymentRepository paymentRepository,
-            ProxyTicket proxyTicket,
-            ProxyNotification ProxyNotification
-    ) {
-        this.paymentRepository = paymentRepository;
-        this.proxyTicket = proxyTicket;
-        this.notificationClient = ProxyNotification;
-    }
+    @Autowired
+    private ProxyTicket proxyTicket;
+
+    @Autowired
+    private ProxyNotification notificationClient;
 
     @Transactional
     public PaymentResponse processPayment(Long userId, CreatePaymentRequest request) {

@@ -5,6 +5,7 @@ import com.bestRuralEvents.AuthService.Model.AuthUser;
 import com.bestRuralEvents.AuthService.DTO.Role;
 import com.bestRuralEvents.AuthService.Repository.AuthUserRepository;
 import com.bestRuralEvents.AuthService.proxy.UserProxy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,22 +13,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AuthService {
 
-    private final AuthUserRepository authUserRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
-    private final UserProxy userProxy;
+    @Autowired
+    private AuthUserRepository authUserRepository;
 
-    public AuthService(
-            AuthUserRepository authUserRepository,
-            PasswordEncoder passwordEncoder,
-            JwtService jwtService,
-            UserProxy userProxy
-    ) {
-        this.authUserRepository = authUserRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtService = jwtService;
-        this.userProxy = userProxy;
-    }
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    private UserProxy userProxy;
 
     @Transactional
     public SignupResponse signup(SignupRequest request) {

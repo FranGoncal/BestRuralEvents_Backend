@@ -9,6 +9,7 @@ import com.bestRuralEvents.EventService.models.EventFavorite;
 import com.bestRuralEvents.EventService.repositories.EventFavoriteRepository;
 import com.bestRuralEvents.EventService.repositories.EventRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,16 +17,11 @@ import java.util.List;
 @Service
 public class EventFavoriteService {
 
-    private final EventFavoriteRepository favoriteRepository;
-    private final EventRepository eventRepository;
+    @Autowired
+    private EventFavoriteRepository favoriteRepository;
 
-    public EventFavoriteService(
-            EventFavoriteRepository favoriteRepository,
-            EventRepository eventRepository
-    ) {
-        this.favoriteRepository = favoriteRepository;
-        this.eventRepository = eventRepository;
-    }
+    @Autowired
+    private EventRepository eventRepository;
 
     public FavoriteEventsResponse getFavoriteEvents(Long userId) {
         validateUserId(userId);

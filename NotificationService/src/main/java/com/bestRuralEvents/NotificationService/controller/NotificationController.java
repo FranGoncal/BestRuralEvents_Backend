@@ -4,6 +4,7 @@ import com.bestRuralEvents.NotificationService.dto.MessageResponse;
 import com.bestRuralEvents.NotificationService.dto.NotificationResponse;
 import com.bestRuralEvents.NotificationService.dto.NotificationStatusResponse;
 import com.bestRuralEvents.NotificationService.service.NotificationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,11 +13,8 @@ import java.util.List;
 @RequestMapping("/notification")
 public class NotificationController {
 
-    private final NotificationService notificationService;
-
-    public NotificationController(NotificationService notificationService) {
-        this.notificationService = notificationService;
-    }
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping
     public List<NotificationResponse> getNotifications(

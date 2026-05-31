@@ -3,6 +3,7 @@ package com.bestRuralEvents.TicketService.controllers;
 import com.bestRuralEvents.TicketService.dto.*;
 import com.bestRuralEvents.TicketService.services.TicketService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,11 +12,8 @@ import java.util.List;
 @RequestMapping("/tickets")
 public class TicketController {
 
-    private final TicketService ticketService;
-
-    public TicketController(TicketService ticketService) {
-        this.ticketService = ticketService;
-    }
+    @Autowired
+    private TicketService ticketService;
 
     @PostMapping
     public TicketResponse buyTicket(

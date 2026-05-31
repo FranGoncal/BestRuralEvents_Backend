@@ -6,6 +6,7 @@ import com.bestRuralEvents.ReviewService.models.Review;
 import com.bestRuralEvents.ReviewService.proxy.UserProxy;
 import com.bestRuralEvents.ReviewService.repositories.ReviewRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,19 +14,14 @@ import java.util.List;
 @Service
 public class ReviewService {
 
-    private final ReviewRepository reviewRepository;
-    private final EventProxy eventClient;
-    private final UserProxy userClient;
+    @Autowired
+    private ReviewRepository reviewRepository;
 
-    public ReviewService(
-            ReviewRepository reviewRepository,
-            EventProxy eventClient,
-            UserProxy userClient
-    ) {
-        this.reviewRepository = reviewRepository;
-        this.eventClient = eventClient;
-        this.userClient = userClient;
-    }
+    @Autowired
+    private EventProxy eventClient;
+
+    @Autowired
+    private UserProxy userClient;
 
     @Transactional
     public ReviewResponse createReview(CreateReviewRequest request, Long userId) {

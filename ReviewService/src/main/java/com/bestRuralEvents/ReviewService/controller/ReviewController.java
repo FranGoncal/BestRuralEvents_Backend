@@ -5,6 +5,7 @@ import com.bestRuralEvents.ReviewService.dto.RatingSummaryResponse;
 import com.bestRuralEvents.ReviewService.dto.ReviewResponse;
 import com.bestRuralEvents.ReviewService.services.ReviewService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,11 +14,8 @@ import java.util.List;
 @RequestMapping("/reviews")
 public class ReviewController {
 
-    private final ReviewService reviewService;
-
-    public ReviewController(ReviewService reviewService) {
-        this.reviewService = reviewService;
-    }
+    @Autowired
+    private ReviewService reviewService;
 
     @PostMapping
     public ReviewResponse createReview(

@@ -7,6 +7,7 @@ import com.bestRuralEvents.ContentService.models.HelpMessage;
 import com.bestRuralEvents.ContentService.models.HelpMessageStatus;
 import com.bestRuralEvents.ContentService.proxy.UserClient;
 import com.bestRuralEvents.ContentService.repository.HelpMessageRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,16 +15,11 @@ import java.util.List;
 @Service
 public class HelpMessageService {
 
-    private final HelpMessageRepository helpMessageRepository;
-    private final UserClient userClient;
+    @Autowired
+    private HelpMessageRepository helpMessageRepository;
 
-    public HelpMessageService(
-            HelpMessageRepository helpMessageRepository,
-            UserClient userClient
-    ) {
-        this.helpMessageRepository = helpMessageRepository;
-        this.userClient = userClient;
-    }
+    @Autowired
+    private UserClient userClient;
 
     public HelpMessage create(HelpMessageRequest request) {
         Long userId = Long.valueOf(request.userId());

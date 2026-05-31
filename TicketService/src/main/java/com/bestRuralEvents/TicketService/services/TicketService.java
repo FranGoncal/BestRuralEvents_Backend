@@ -23,24 +23,18 @@ import java.util.UUID;
 @Service
 public class TicketService {
 
-    private final ProxyUser proxyUser;
-    private final TicketRepository ticketRepository;
-    private final ProxyEvent proxyEvent;
-    //private final ProxyPayment proxyPayment;
+    @Autowired
+    private TicketRepository ticketRepository;
 
-    private final ProxyNotification proxyNotification;
+    @Autowired
+    private ProxyEvent proxyEvent;
 
-    public TicketService(
-            TicketRepository ticketRepository,
-            ProxyEvent proxyEvent,
-            ProxyNotification proxyNotification,
-            ProxyUser proxyUser
-    ) {
-        this.ticketRepository = ticketRepository;
-        this.proxyEvent = proxyEvent;
-        this.proxyNotification = proxyNotification;
-        this.proxyUser = proxyUser;
-    }
+    @Autowired
+    private ProxyNotification proxyNotification;
+
+    @Autowired
+    private ProxyUser proxyUser;
+        
 
     public EventTicketsManagementResponse getEventTicketsForManagement(Long organizerId, Long eventId) {
         EventResponse event = proxyEvent.getEventById(eventId);

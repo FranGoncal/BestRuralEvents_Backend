@@ -7,6 +7,7 @@ import com.bestRuralEvents.ContentService.dto.HelpMessageStatusUpdateRequest;
 import com.bestRuralEvents.ContentService.models.HelpMessage;
 import com.bestRuralEvents.ContentService.service.HelpMessageService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,11 +16,8 @@ import java.util.List;
 @RequestMapping("/content/help")
 public class HelpController {
 
-    private final HelpMessageService helpMessageService;
-
-    public HelpController(HelpMessageService helpMessageService) {
-        this.helpMessageService = helpMessageService;
-    }
+    @Autowired
+    private HelpMessageService helpMessageService;
 
     @PostMapping
     public HelpMessageResponse submitHelpMessage(

@@ -4,6 +4,7 @@ import com.bestRuralEvents.NotificationService.dto.DeviceTokenDebugResponse;
 import com.bestRuralEvents.NotificationService.dto.NotificationDebugResponse;
 import com.bestRuralEvents.NotificationService.repository.DeviceTokenRepository;
 import com.bestRuralEvents.NotificationService.repository.NotificationRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,16 +16,11 @@ import java.util.List;
 @RequestMapping("/debug")
 public class DebugController {
 
-    private final DeviceTokenRepository deviceTokenRepository;
-    private final NotificationRepository notificationRepository;
+    @Autowired
+    private DeviceTokenRepository deviceTokenRepository;
 
-    public DebugController(
-            DeviceTokenRepository deviceTokenRepository,
-            NotificationRepository notificationRepository
-    ) {
-        this.deviceTokenRepository = deviceTokenRepository;
-        this.notificationRepository = notificationRepository;
-    }
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     @GetMapping("/device-tokens")
     public List<DeviceTokenDebugResponse> getAllDeviceTokens() {

@@ -5,17 +5,15 @@ import com.bestRuralEvents.UserService.DTO.MessageResponse;
 import com.bestRuralEvents.UserService.DTO.UserResponse;
 import com.bestRuralEvents.UserService.Service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/internal/users")
 public class InternalUserController {
 
-    private final UserService userService;
-
-    public InternalUserController(UserService userService) {
-        this.userService = userService;
-    }
+    @Autowired
+    private UserService userService;
 
     @PostMapping
     public MessageResponse createUserProfile(

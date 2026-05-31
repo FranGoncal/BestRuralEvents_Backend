@@ -5,6 +5,7 @@ import com.bestRuralEvents.AdminFrontendService.dto.FaqListResponse;
 import com.bestRuralEvents.AdminFrontendService.proxy.ContentClient;
 import com.bestRuralEvents.AdminFrontendService.security.AdminTokenProvider;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,13 +14,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/admin/faqs")
 public class AdminFaqController {
 
-    private final ContentClient contentClient;
-    private final AdminTokenProvider tokenProvider;
+    @Autowired
+    private ContentClient contentClient;
 
-    public AdminFaqController(ContentClient contentClient, AdminTokenProvider tokenProvider) {
-        this.contentClient = contentClient;
-        this.tokenProvider = tokenProvider;
-    }
+    @Autowired
+    private AdminTokenProvider tokenProvider;
 
     @GetMapping
     public String listFaqs(Model model, HttpSession session) {

@@ -4,6 +4,7 @@ import com.bestRuralEvents.AdminFrontendService.dto.LoginRequest;
 import com.bestRuralEvents.AdminFrontendService.dto.LoginResponse;
 import com.bestRuralEvents.AdminFrontendService.proxy.AuthClient;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,11 +14,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/admin")
 public class AdminAuthController {
 
-    private final AuthClient authClient;
-
-    public AdminAuthController(AuthClient authClient) {
-        this.authClient = authClient;
-    }
+    @Autowired
+    private AuthClient authClient;
 
     @GetMapping("/login")
     public String loginPage(Model model) {

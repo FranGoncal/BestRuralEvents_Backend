@@ -6,16 +6,14 @@ import com.bestRuralEvents.UserService.DTO.UserProfileResponse;
 import com.bestRuralEvents.UserService.DTO.UserResponse;
 import com.bestRuralEvents.UserService.Repository.UserRepository;
 import com.bestRuralEvents.UserService.models.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
-
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    @Autowired
+    private UserRepository userRepository;
 
     public void createUserProfile(CreateUserProfileRequest request) {
         if (userRepository.existsById(request.id())) {

@@ -3,17 +3,15 @@ package com.bestRuralEvents.EventService.controllers;
 import com.bestRuralEvents.EventService.DTO.FavoriteEventsResponse;
 import com.bestRuralEvents.EventService.DTO.FavoriteStatusResponse;
 import com.bestRuralEvents.EventService.services.EventFavoriteService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/events")
 public class EventFavoriteController {
 
-    private final EventFavoriteService favoriteService;
-
-    public EventFavoriteController(EventFavoriteService favoriteService) {
-        this.favoriteService = favoriteService;
-    }
+    @Autowired
+    private EventFavoriteService favoriteService;
 
     @GetMapping("/favourites")
     public FavoriteEventsResponse getFavoriteEvents(@RequestParam Long userId) {

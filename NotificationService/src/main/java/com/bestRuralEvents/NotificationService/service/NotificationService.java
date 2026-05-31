@@ -6,6 +6,7 @@ import com.bestRuralEvents.NotificationService.models.DeviceToken;
 import com.bestRuralEvents.NotificationService.models.Notification;
 import com.bestRuralEvents.NotificationService.repository.DeviceTokenRepository;
 import com.bestRuralEvents.NotificationService.repository.NotificationRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,19 +15,14 @@ import java.util.List;
 @Service
 public class NotificationService {
 
-    private final NotificationRepository notificationRepository;
-    private final DeviceTokenRepository deviceTokenRepository;
-    private final FirebasePushService firebasePushService;
+    @Autowired
+    private NotificationRepository notificationRepository;
 
-    public NotificationService(
-            NotificationRepository notificationRepository,
-            DeviceTokenRepository deviceTokenRepository,
-            FirebasePushService firebasePushService
-    ) {
-        this.notificationRepository = notificationRepository;
-        this.deviceTokenRepository = deviceTokenRepository;
-        this.firebasePushService = firebasePushService;
-    }
+    @Autowired
+    private DeviceTokenRepository deviceTokenRepository;
+
+    @Autowired
+    private FirebasePushService firebasePushService;
 
     @Transactional
     public Notification createAndSend(CreateNotificationRequest request) {

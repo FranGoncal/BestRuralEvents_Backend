@@ -4,6 +4,7 @@ import com.bestRuralEvents.EventService.DTO.*;
 import com.bestRuralEvents.EventService.models.TicketMode;
 import com.bestRuralEvents.EventService.services.EventService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,11 +20,8 @@ import java.util.List;
 @RequestMapping("/events")
 public class EventController {
 
-    private final EventService eventService;
-
-    public EventController(EventService eventService) {
-        this.eventService = eventService;
-    }
+    @Autowired
+    private EventService eventService;
 
     @GetMapping("/main-page")
     public MainPageResponse getMainPageEvents() {

@@ -5,17 +5,15 @@ import com.bestRuralEvents.UserService.DTO.UpdateUserProfileRequest;
 import com.bestRuralEvents.UserService.DTO.UserProfileResponse;
 import com.bestRuralEvents.UserService.Service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
 
-    private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/{id}")
     public UserProfileResponse getUserProfile(@PathVariable Long id) {
